@@ -1,0 +1,7 @@
+.filecache*.json
+.runtime.json
+.launch.lock
+.server.log
+hq.config.json
+node_modules/
+assets/*.glb

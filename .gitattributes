@@ -1,0 +1,2 @@
+vendor/three/** -text
+*.glb binary

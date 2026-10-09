@@ -1,0 +1,248 @@
+:root {
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+  color-scheme: light;
+  --bg: #ffffff; --raise: #f6f6f4; --line: rgba(17, 17, 19, .08); --text: #0f0f11; --muted: #6b6b70; --faint: #b4b4b9;
+  /* --accent draws lines and fills; --accent-ink is the same gold dark enough to read as text on white */
+  --accent: #b8913a; --accent-ink: #876718; --work: #12823a; --think: #0062cc; --need: #c2410c; --idle: #6b6b70; --bad: #c4001a;
+  /* the one motion system: one curve, three durations; motion.js reads these, reduced motion zeroes them */
+  --ease: cubic-bezier(.2, .8, .2, 1); --t-fast: 160ms; --t-mid: 260ms; --t-slow: 420ms;
+  /* the page runs edge to edge: one gutter that grows with the window, 16 px on a phone, 48 px at most */
+  --gutter: clamp(16px, 3vw, 48px);
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; } /* a hidden progress row or the hidden Penthouse view (display: flex) stays hidden whatever its display is */
+html, body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 var(--font); -webkit-font-smoothing: antialiased; }
+body { overflow-x: hidden; }
+a { color: inherit; }
+.top { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 28px; height: 56px; padding: 0 var(--gutter); background: color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--line); }
+.brand { font-weight: 700; letter-spacing: .08em; }
+.tabs { position: relative; display: flex; gap: 22px; height: 100%; }
+.tabs a { display: flex; align-items: center; text-decoration: none; font-weight: 600; color: var(--muted); transition: color var(--t-fast) var(--ease); }
+.tabs a[aria-current="page"] { color: var(--text); }
+.top > .quiet { margin-left: auto; }
+.top .pill { margin: 0; font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+/* the indexing state: a hairline under the header that fills, or sweeps while the total is unknown */
+.load-line { position: absolute; left: 0; bottom: -1px; height: 2px; width: 0; background: var(--accent); transition: width var(--t-slow) var(--ease); }
+.load-line.busy { width: 30%; animation: sweep 1.4s var(--ease) infinite alternate; }
+.stale { margin: 0; padding: 10px var(--gutter) 0; font-size: 12.5px; color: var(--muted); } /* a failed refresh: one quiet line, the data stays up */
+@keyframes sweep { to { transform: translateX(233%); } }
+main { padding: 20px var(--gutter) 56px; }
+/* the modular grid: twelve columns at a desk (the hero and the vitals over the live rows, the map over
+   the Flow), two on a tablet, one on a phone. Modules are set apart by whitespace, alignment and
+   hairlines, never boxed; each has a quiet title in the page's type */
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-areas: "h h h h h v v v t t t t" "l l l l l l l l f f f f"; gap: 28px 32px; align-items: start; }
+.grid > .hero { grid-area: h; }
+.grid > .vitals { grid-area: v; }
+.grid > .who { grid-area: t; }
+.grid > .live { grid-area: l; }
+.grid > .rail { grid-area: f; }
+.grid > * { min-width: 0; }
+.mod > h2 { margin: 0; padding-bottom: 10px; border-bottom: 1px solid var(--line); font: 600 15px/1.2 var(--font); color: var(--text); }
+.rail > h2 { padding-bottom: 6px; border-bottom: 0; } /* the filters under it carry the hairline */
+.empty, .muted { color: var(--muted); }
+:is(.tabs a, .ranges button, .filters button, .quiet, .ri-head, .node[role="button"], .fl[role="button"]):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ri-head:focus-visible { outline-offset: -2px; }
+/* quiet buttons: a word, no fill, no border */
+.quiet { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--muted); transition: color var(--t-fast) var(--ease); }
+.quiet:hover { color: var(--text); }
+#streamer-top[aria-pressed="true"] { color: var(--accent-ink); }
+/* streamer mode: what is drawn is the mask, never the name; the blur only softens the mask */
+.masked { filter: blur(3px); user-select: none; }
+/* a long list scrolls inside its module and fades at the bottom edge while there is more below */
+.scroll { overflow: auto; scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
+.scroll.more { -webkit-mask-image: linear-gradient(#000 calc(100% - 36px), transparent); mask-image: linear-gradient(#000 calc(100% - 36px), transparent); }
+/* the underline that slides between tabs, ranges and filters; its group is position: relative */
+.ind { position: absolute; left: 0; bottom: 0; height: 2px; width: 0; background: var(--accent); transition: transform var(--t-mid) var(--ease), width var(--t-mid) var(--ease); pointer-events: none; }
+.filters .ind { background: var(--text); }
+/* numbers that roll: one span per character, the old one drawn by ::before. The clip is the band the
+   glyphs occupy (a little above the cap line to just under a comma), so a digit enters and leaves
+   through a slot the height of the number, not the whole line box */
+.roll { clip-path: inset(.12em 0 -.04em); line-height: 1.05; }
+b.roll, span.roll { display: inline-block; }
+.dg { position: relative; display: inline-block; }
+.dg[data-out]::before { content: attr(data-out); position: absolute; left: 0; }
+.dg.up::before { top: -100%; }
+.dg.down::before { top: 100%; }
+/* the headline number and its chart */
+.hero-label { margin: 0; font-size: 14px; color: var(--muted); }
+.hero-num { margin: 2px 0 0; font: 600 48px/1.05 var(--display); letter-spacing: -.035em; font-variant-numeric: tabular-nums; transition: color var(--t-fast) var(--ease); }
+.hero-num.is-empty { color: var(--faint); }
+.hero-delta { margin: 6px 0 0; min-height: 20px; font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.hero-delta b { color: var(--accent-ink); font-weight: 600; }
+.chart-wrap { position: relative; height: 150px; margin-top: 14px; touch-action: pan-y; cursor: crosshair; }
+.chart { display: block; width: 100%; height: 100%; overflow: visible; }
+.chart path { fill: none; stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; transition: stroke var(--t-fast) var(--ease); }
+.chart .base { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 1 5; vector-effect: non-scaling-stroke; opacity: .7; }
+.hair { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--muted); opacity: .45; pointer-events: none; }
+.knob { position: absolute; width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--bg); pointer-events: none; }
+.ranges { position: relative; display: flex; gap: 22px; margin-top: 10px; border-bottom: 1px solid var(--line); }
+.ranges button { all: unset; cursor: pointer; padding: 9px 0 10px; font-size: 13px; font-weight: 600; color: var(--muted); transition: color var(--t-fast) var(--ease); }
+.ranges button:hover { color: var(--text); }
+.ranges button[aria-pressed="true"] { color: var(--accent-ink); }
+/* the vitals: five figures down the column beside the hero, one hairline each */
+.stats { display: grid; margin: 0; font-size: 13.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.stats > span { display: flex; align-items: baseline; gap: 8px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.stats b { color: var(--text); font: 600 19px/1.1 var(--display); letter-spacing: -.01em; }
+/* live sessions as rows; each opens its details under itself */
+.rows { list-style: none; margin: 0; padding: 0; position: relative; max-height: 280px; transition: max-height var(--t-slow) var(--ease); }
+.rows.has-open { max-height: 70vh; }
+.row-item { border-bottom: 1px solid var(--line); }
+.row-item p { margin: 0; }
+.ri-head { display: grid; grid-template-columns: minmax(0, 1fr) 96px 84px; align-items: center; gap: 20px; padding: 13px 0; cursor: pointer; }
+.ri-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: transparent; transition: text-decoration-color var(--t-fast) var(--ease); }
+.ri-head:hover .ri-name, .row-item.open .ri-name { text-decoration-color: currentColor; }
+.ri-where { margin-left: 8px; font-size: 13px; font-weight: 400; color: var(--muted); }
+.ri-sub, .ri-meta { margin-top: 2px !important; font-size: 14px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ri-meta { font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.ri-prog { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-size: 12.5px; color: var(--muted); }
+.ri-prog .track { flex: 0 0 120px; height: 2px; background: var(--line); overflow: hidden; }
+.ri-prog-t { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ri-prog .fill { display: block; height: 100%; background: var(--accent); transition: width var(--t-slow) var(--ease); }
+.spark { width: 96px; height: 32px; }
+.spark path { fill: none; stroke: var(--faint); stroke-width: 1.5; vector-effect: non-scaling-stroke; transition: stroke var(--t-fast) var(--ease), d var(--t-slow) var(--ease); }
+.st-working .spark path { stroke: var(--work); }
+.st-thinking .spark path { stroke: var(--think); }
+.st-needs-you .spark path { stroke: var(--need); }
+/* status is colored text, never a filled pill; the color eases when it changes */
+.st-label { font-size: 13.5px; font-weight: 600; text-align: right; white-space: nowrap; color: var(--idle); transition: color var(--t-fast) var(--ease); }
+.st-label.c-working { color: var(--work); }
+.st-label.c-thinking { color: var(--think); }
+.st-label.c-needs-you { color: var(--need); }
+/* the details unfold under the row: the wrapper's grid row grows from 0fr to 1fr while the content
+   fades in a beat later; closed, it is hidden from the tab order once the row has folded. Hairlines
+   and type only, no box */
+.ri-more { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows var(--t-slow) var(--ease), visibility 0s var(--t-slow); }
+.row-item.open > .ri-more { grid-template-rows: 1fr; visibility: visible; transition: grid-template-rows var(--t-slow) var(--ease), visibility 0s; }
+.ri-detail { min-height: 0; overflow: hidden; opacity: 0; transform: translateY(-6px); transition: opacity var(--t-mid) var(--ease), transform var(--t-mid) var(--ease); }
+.row-item.open .ri-detail { opacity: 1; transform: none; transition-delay: calc(var(--t-fast) / 2); }
+.ri-body { padding: 2px 0 22px; font-size: 13.5px; }
+.ri-path { font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+.ri-line { display: flex; align-items: baseline; gap: 10px; margin-top: 4px !important; color: var(--muted); }
+.ri-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 32px; }
+.ri-body section { margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--line); }
+.ri-body h3 { margin: 0 0 6px; font-size: 12.5px; font-weight: 600; color: var(--muted); }
+.ri-body section p { margin: 0; overflow-wrap: anywhere; }
+.ri-body h3 .n { margin-left: 6px; font-weight: 400; font-variant-numeric: tabular-nums; }
+/* every list under a row: four items tall, each item two lines at most, the rest scroll inside the box */
+.ri-list { --ri-item: 42px; list-style: none; margin: 0; padding: 0; max-height: calc(4 * var(--ri-item)); overscroll-behavior: contain; }
+.ri-list li { box-sizing: border-box; height: var(--ri-item); padding: 4px 0 5px; line-height: 16px; border-bottom: 1px solid var(--line); overflow: hidden; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.ri-list li:last-child { border-bottom: 0; }
+.ri-list.more { -webkit-mask-image: linear-gradient(#000 calc(100% - 18px), transparent); mask-image: linear-gradient(#000 calc(100% - 18px), transparent); }
+.timeline li { display: grid; grid-template-columns: 60px minmax(0, 1fr); gap: 8px; }
+.timeline li span { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.timeline time { color: var(--muted); font-variant-numeric: tabular-nums; }
+/* the flow rail: a plain column, separated by whitespace, not a boxed card */
+.filters { position: relative; display: flex; gap: 20px; margin-bottom: 2px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+.filters button { all: unset; flex: none; cursor: pointer; padding: 8px 0 10px; font-size: 13px; font-weight: 600; color: var(--muted); transition: color var(--t-fast) var(--ease); }
+.filters button:hover, .filters button[aria-pressed="true"] { color: var(--text); }
+.warn { margin: 8px 0; font-size: 13.5px; color: var(--need); }
+.flow { list-style: none; margin: 0; padding: 0; max-height: 244px; }
+.fl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.fl:last-child { border-bottom: 0; }
+.fl[role="button"] { cursor: pointer; }
+.fl-who, .fl-what { margin: 0; overflow-wrap: anywhere; }
+.fl-who { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: transparent; transition: color var(--t-slow) var(--ease), text-decoration-color var(--t-fast) var(--ease); }
+.fl[role="button"]:hover .fl-who { text-decoration-color: currentColor; }
+.fl-new .fl-who { color: var(--accent-ink); } /* a new item reads in the accent for a beat, then settles */
+.fl-who b { font-weight: 600; }
+.fl-what { margin-top: 2px; color: var(--muted); }
+.fl-what a { color: var(--text); }
+.fl-side { font-size: 12px; text-align: right; white-space: nowrap; color: var(--muted); font-variant-numeric: tabular-nums; }
+.fl-side .st { display: block; margin-top: 3px; font-weight: 600; }
+.st { transition: color var(--t-fast) var(--ease); }
+.st.running { color: var(--accent-ink); } .st.done { color: var(--work); } .st.failed { color: var(--bad); } .st.quiet, .st.stopped { color: var(--idle); }
+/* who works with whom: the map fills its module's box; --team-h is the drawing's height in viewBox units */
+.team { --team-h: 270; height: 270px; }
+.team > p { margin: 14px 0 0; }
+.team svg { display: block; width: 100%; height: 100%; }
+/* delegations solid, messages dotted, running work in gold; nodes are small dots with their names;
+   curves and nodes ease to new places when the map changes */
+.edge { fill: none; stroke: rgba(17, 17, 19, .2); transition: d var(--t-slow) var(--ease), stroke var(--t-fast) var(--ease); }
+.edge.handoff { stroke-dasharray: 1 5; stroke-linecap: round; }
+.edge.active { stroke: var(--accent); stroke-dasharray: 6 8; stroke-linecap: butt; animation: flowing 1.1s linear infinite; }
+@keyframes flowing { to { stroke-dashoffset: -28; } }
+.away .edge.active { animation-play-state: paused; } /* HQ in the background (app.js): the dash holds still and costs nothing */
+.node { transition: transform var(--t-slow) var(--ease); }
+.node circle { fill: var(--faint); transition: fill var(--t-fast) var(--ease); }
+.node.session circle { fill: var(--idle); }
+.node.s-working circle { fill: var(--work); }
+.node.s-thinking circle { fill: var(--think); }
+.node.s-needs-you circle { fill: var(--need); }
+.node text { font: 500 12px var(--font); fill: var(--muted); text-anchor: middle; paint-order: stroke; stroke: var(--bg); stroke-width: 4px; stroke-linejoin: round; }
+.node.session text { font-weight: 600; fill: var(--text); }
+.node[role="button"] { cursor: pointer; }
+.node[role="button"]:hover text { text-decoration: underline; }
+/* the Penthouse tab: the room alone, edge to edge, from under the header (and the stale-data line when it
+   shows) down to the bottom of the window: the page becomes a column the window's height and the room takes
+   whatever the rows above it leave (its own bar carries Streamer and Full screen); hidden with its view it
+   has no box, so it sleeps */
+body:has(> main > #view-penthouse:not([hidden])) { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
+body:has(> main > #view-penthouse:not([hidden])) > main { flex: 1 1 0; display: flex; flex-direction: column; padding: 0; }
+#view-penthouse { flex: 1 1 0; display: flex; flex-direction: column; }
+#floor { position: relative; flex: 1 1 0; min-height: 360px; overflow: hidden; background: #05060a; }
+/* financials: a card after the grid, the spend hero and its panels on the same twelve columns; an old
+   #financials bookmark scrolls to it, clear of the sticky header */
+.financials { margin-top: 28px; scroll-margin-top: 72px; }
+.financials .fin-grid { margin-top: 16px; }
+.fin-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 28px 32px; align-items: start; }
+.fin-body { display: contents; }
+.fin-hero { grid-column: span 8; min-width: 0; }
+.fin-grid .panel { grid-column: span 4; min-width: 0; padding-top: 10px; border-top: 1px solid var(--line); }
+.fin-grid .panel.half { grid-column: span 6; }
+.fin-grid .panel.full { grid-column: span 12; }
+.fin-grid h3 { margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.fin-grid .scroll { max-height: 260px; }
+.big { margin: 0; font: 600 34px/1.1 var(--display); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.fin-chip { margin: 8px 0 4px; font-size: 14px; color: var(--muted); }
+.good { color: var(--work); } .bad { color: var(--bad); }
+.kv, .fin-grid .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.kv:last-child, .fin-grid .row:last-child { border-bottom: 0; }
+.fin-grid .row .label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kv .v, .fin-grid .row .meta { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.small { font-size: 12.5px; }
+.mm { display: flex; height: 10px; margin-bottom: 12px; overflow: hidden; border-radius: 5px; background: var(--raise); }
+.agents { display: grid; grid-template-columns: 1fr repeat(3, auto); gap: 8px 18px; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+.agents .h { font-size: 12px; color: var(--muted); }
+.mono { font-family: var(--mono); font-size: 12px; white-space: pre-wrap; }
+.prog-track { height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }
+.prog-fill { height: 100%; background: var(--accent); transition: width var(--t-slow) var(--ease); }
+@media (max-width: 1100px) {
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-areas: "h h" "v v" "l f" "t t"; gap: 32px; }
+  .vitals > h2 { display: none; } /* the figures read as one line under the hero */
+  .stats { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: -8px; }
+  .stats > span { padding: 0; border: 0; }
+  .stats b { font-size: 15px; }
+  .hero-num { font-size: 52px; }
+  .chart-wrap { height: 180px; }
+  .team { --team-h: 360; height: auto; }
+  .team svg { height: auto; max-height: 360px; }
+  .ri-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fin-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fin-hero, .fin-grid .panel.full { grid-column: span 2; }
+  .fin-grid .panel, .fin-grid .panel.half { grid-column: span 1; }
+}
+@media (max-width: 700px) {
+  .grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "h" "v" "l" "f" "t"; gap: 28px; }
+  .rows, .rows.has-open, .flow, .fin-grid .scroll { max-height: none; } /* one column: the page scrolls, not the module */
+  .ri-cols { grid-template-columns: minmax(0, 1fr); }
+  .fin-grid { grid-template-columns: minmax(0, 1fr); }
+  .fin-hero, .fin-grid .panel, .fin-grid .panel.half, .fin-grid .panel.full { grid-column: auto; }
+}
+@media (max-width: 560px) {
+  .top { gap: 18px; }
+  .top .pill { display: none; }
+  .hero-num { font-size: 42px; }
+  .ri-head { grid-template-columns: minmax(0, 1fr) 56px 76px; gap: 12px; }
+  .spark { width: 56px; }
+  .ri-prog .track { flex-basis: 56px; }
+  .st-label { font-size: 12.5px; }
+  .ri-where { display: none; }
+}
+/* every duration above comes from the tokens, so zeroing them makes each move land at once */
+@media (prefers-reduced-motion: reduce) {
+  :root { --t-fast: 0ms; --t-mid: 0ms; --t-slow: 0ms; }
+  .edge.active, .load-line.busy { animation: none; }
+}

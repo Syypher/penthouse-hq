@@ -1,0 +1,432 @@
+{
+  "appName": "HQ",
+  "planUsd": 200,
+  "accent": "#d6b25e",
+  "owner": {
+    "name": "You",
+    "look": "Navy suit, white shirt, gold tie, gold watch.",
+    "avatar": {
+      "skin": "#e0b08a",
+      "hair": [
+        "slick",
+        "#4f3a24"
+      ],
+      "top": "suit",
+      "jacket": "#141b2c",
+      "shirt": "#ffffff",
+      "tie": "#c9a43c",
+      "pants": "#141b2c",
+      "extras": [
+        "watch",
+        "pocketSquare"
+      ]
+    }
+  },
+  "departments": [
+    {
+      "name": "Product",
+      "color": "#8e8cff"
+    },
+    {
+      "name": "Debugging",
+      "color": "#ff5a4f"
+    },
+    {
+      "name": "Growth",
+      "color": "#ffa31a"
+    },
+    {
+      "name": "Support",
+      "color": "#c77dff"
+    },
+    {
+      "name": "Operations",
+      "color": "#5ad8ff"
+    }
+  ],
+  "agents": [
+    {
+      "id": "engineer",
+      "name": "Engineer",
+      "dept": "Product",
+      "agentTypes": [
+        "general-purpose"
+      ],
+      "hangout": "pool",
+      "look": "Charcoal vest and trousers, white shirt with the sleeves rolled, oxblood tie, black frames.",
+      "avatar": {
+        "skin": "#c68e64",
+        "hair": [
+          "short",
+          "#1c1410"
+        ],
+        "top": "vest",
+        "vest": "#2a2c31",
+        "shirt": "#f3f2ee",
+        "tie": "#5b1d24",
+        "pants": "#2a2c31",
+        "sleeves": "rolled",
+        "extras": [
+          "glasses",
+          "watch"
+        ]
+      }
+    },
+    {
+      "id": "qa",
+      "name": "QA and Release Guard",
+      "dept": "Product",
+      "agentTypes": [
+        "pr-review-toolkit:*",
+        "code-review*"
+      ],
+      "hangout": "couch-a",
+      "look": "Midnight navy suit, pale blue shirt, gold tie, white pocket square.",
+      "avatar": {
+        "skin": "#e3b993",
+        "hair": [
+          "slick",
+          "#3a281b"
+        ],
+        "top": "suit",
+        "jacket": "#1b2340",
+        "shirt": "#dde6f2",
+        "tie": "#b8913a",
+        "pants": "#1b2340",
+        "extras": [
+          "pocketSquare",
+          "watch"
+        ]
+      }
+    },
+    {
+      "id": "designer",
+      "name": "Designer",
+      "dept": "Product",
+      "agentTypes": [
+        "Plan"
+      ],
+      "hangout": "sim-1",
+      "look": "Black turtleneck under a charcoal blazer, round black frames.",
+      "avatar": {
+        "skin": "#f0c7a2",
+        "hair": [
+          "bun",
+          "#2a1a12"
+        ],
+        "top": "blazer",
+        "jacket": "#2b2b2f",
+        "shirt": "#0f0f11",
+        "turtleneck": true,
+        "pants": "#1c1c1f",
+        "extras": [
+          "glasses"
+        ]
+      }
+    },
+    {
+      "id": "bughunter",
+      "name": "Bug Hunter",
+      "dept": "Debugging",
+      "agentTypes": [
+        "debug*"
+      ],
+      "hangout": "window-gaze",
+      "look": "Black shirt with the sleeves rolled, red tie pulled loose, headset on.",
+      "avatar": {
+        "skin": "#8d5a3b",
+        "hair": [
+          "buzz",
+          "#0d0a08"
+        ],
+        "top": "shirt",
+        "shirt": "#1a1a1f",
+        "tie": "#b3121b",
+        "pants": "#23252b",
+        "sleeves": "rolled",
+        "extras": [
+          "headset",
+          "watch"
+        ]
+      }
+    },
+    {
+      "id": "errorwatch",
+      "name": "Error Watch",
+      "dept": "Debugging",
+      "agentTypes": [
+        "sre*",
+        "error*"
+      ],
+      "hangout": "arcade-1",
+      "look": "Oxblood vest over a gray shirt, black tie, black frames.",
+      "avatar": {
+        "skin": "#d9a37f",
+        "hair": [
+          "curly",
+          "#3b2414"
+        ],
+        "top": "vest",
+        "vest": "#4a1418",
+        "shirt": "#b9bcc2",
+        "tie": "#111114",
+        "pants": "#2a2a2e",
+        "extras": [
+          "glasses"
+        ]
+      }
+    },
+    {
+      "id": "seo",
+      "name": "SEO/AEO Officer",
+      "dept": "Growth",
+      "agentTypes": [
+        "seo*"
+      ],
+      "hangout": "hightop-a",
+      "look": "Light gray suit, crisp white shirt, navy tie, pocket square, thin gold frames.",
+      "avatar": {
+        "skin": "#d8a47c",
+        "hair": [
+          "slick",
+          "#120e0b"
+        ],
+        "top": "suit",
+        "jacket": "#8a8d93",
+        "shirt": "#ffffff",
+        "tie": "#1d3557",
+        "pants": "#8a8d93",
+        "frames": "gold",
+        "extras": [
+          "pocketSquare",
+          "glasses"
+        ]
+      }
+    },
+    {
+      "id": "social",
+      "name": "Social and Content",
+      "dept": "Growth",
+      "agentTypes": [
+        "content*",
+        "marketing*"
+      ],
+      "hangout": "bar-stand",
+      "look": "Burgundy velvet blazer over a black tee, black trousers, gold watch.",
+      "avatar": {
+        "skin": "#efc6a6",
+        "hair": [
+          "long",
+          "#6a3c1d"
+        ],
+        "top": "blazer",
+        "jacket": "#5a1528",
+        "velvet": true,
+        "shirt": "#151517",
+        "pants": "#151517",
+        "extras": [
+          "watch"
+        ]
+      }
+    },
+    {
+      "id": "sales",
+      "name": "Sales Outreach",
+      "dept": "Growth",
+      "agentTypes": [
+        "sales*"
+      ],
+      "hangout": "bar-stool",
+      "look": "Navy pinstripe double-breasted suit, white shirt, red power tie.",
+      "avatar": {
+        "skin": "#e6b28c",
+        "hair": [
+          "slick",
+          "#24180f"
+        ],
+        "top": "double",
+        "jacket": "#1a2030",
+        "pinstripe": true,
+        "shirt": "#ffffff",
+        "tie": "#b0141c",
+        "pants": "#1a2030",
+        "extras": [
+          "watch"
+        ]
+      }
+    },
+    {
+      "id": "support",
+      "name": "Support Desk",
+      "dept": "Support",
+      "agentTypes": [
+        "claude-code-guide",
+        "statusline-setup"
+      ],
+      "hangout": "war-a",
+      "look": "Camel blazer over a black turtleneck, headset on.",
+      "avatar": {
+        "skin": "#a56e4c",
+        "hair": [
+          "bun",
+          "#18110e"
+        ],
+        "top": "blazer",
+        "jacket": "#ad8656",
+        "shirt": "#1c1c1e",
+        "turtleneck": true,
+        "pants": "#2b2622",
+        "extras": [
+          "headset"
+        ]
+      }
+    },
+    {
+      "id": "onboarding",
+      "name": "Onboarding Guide",
+      "dept": "Support",
+      "agentTypes": [
+        "Explore"
+      ],
+      "hangout": "coffee",
+      "look": "Cream suit over a navy top, gold watch.",
+      "avatar": {
+        "skin": "#c48a62",
+        "hair": [
+          "long",
+          "#1a110c"
+        ],
+        "top": "blazer",
+        "jacket": "#e2d5bd",
+        "shirt": "#1d2a44",
+        "pants": "#e2d5bd",
+        "extras": [
+          "watch"
+        ]
+      }
+    },
+    {
+      "id": "infra",
+      "name": "Infra Watch",
+      "dept": "Operations",
+      "agentTypes": [
+        "devops*",
+        "deploy*",
+        "infra*"
+      ],
+      "hangout": "skyline-a",
+      "look": "Graphite blazer over a slate turtleneck, headset and a badge lanyard.",
+      "avatar": {
+        "skin": "#77503a",
+        "hair": [
+          "curly",
+          "#0e0b09"
+        ],
+        "top": "blazer",
+        "jacket": "#202226",
+        "shirt": "#2d394b",
+        "turtleneck": true,
+        "pants": "#1b1d21",
+        "extras": [
+          "headset",
+          "lanyard"
+        ]
+      }
+    },
+    {
+      "id": "billing",
+      "name": "Billing Watch",
+      "dept": "Operations",
+      "agentTypes": [
+        "finance*",
+        "billing*"
+      ],
+      "hangout": "nap",
+      "look": "Banker green vest and tie, cream shirt with sleeve garters, green visor, reading glasses.",
+      "avatar": {
+        "skin": "#efcfad",
+        "hair": [
+          "short",
+          "#8d8a85"
+        ],
+        "top": "vest",
+        "vest": "#1e3b2c",
+        "shirt": "#f4eee2",
+        "tie": "#1e3b2c",
+        "pants": "#262626",
+        "sleeves": "garters",
+        "extras": [
+          "visor",
+          "glasses"
+        ]
+      }
+    },
+    {
+      "id": "security",
+      "name": "Security and Compliance",
+      "dept": "Operations",
+      "agentTypes": [
+        "security*"
+      ],
+      "hangout": "hoops",
+      "look": "All black: suit, shirt and tie. Dark glasses and an earpiece.",
+      "avatar": {
+        "skin": "#5e3f2c",
+        "hair": [
+          "buzz",
+          "#0c0a09"
+        ],
+        "top": "suit",
+        "jacket": "#0c0c0f",
+        "shirt": "#141418",
+        "tie": "#0c0c0f",
+        "pants": "#0c0c0f",
+        "extras": [
+          "sunglasses",
+          "earpiece"
+        ]
+      }
+    }
+  ],
+  "sessionAvatars": [
+    {
+      "look": "Light blue shirt, sleeves rolled, navy tie, suspenders, badge lanyard.",
+      "avatar": {
+        "skin": "#d19d76",
+        "hair": [
+          "short",
+          "#2b1f18"
+        ],
+        "top": "shirt",
+        "shirt": "#cfe0f4",
+        "tie": "#1b2a4a",
+        "pants": "#30343b",
+        "sleeves": "rolled",
+        "extras": [
+          "suspenders",
+          "lanyard"
+        ]
+      }
+    },
+    {
+      "look": "White shirt, wine tie, steel frames, badge lanyard.",
+      "avatar": {
+        "skin": "#b9825d",
+        "hair": [
+          "slick",
+          "#16110d"
+        ],
+        "top": "shirt",
+        "shirt": "#ffffff",
+        "tie": "#6a1d2d",
+        "pants": "#25282e",
+        "watch": "steel",
+        "extras": [
+          "lanyard",
+          "glasses",
+          "watch"
+        ]
+      }
+    }
+  ]
+}

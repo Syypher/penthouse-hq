@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>HQ</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext x='16' y='23' font-size='18' font-family='system-ui' font-weight='700' text-anchor='middle' fill='%23b8913a'%3EHQ%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="/public/app.css">
+<link rel="stylesheet" href="/public/floor/floor.css">
+<script type="importmap">
+{ "imports": { "three": "/vendor/three/build/three.module.js", "three/addons/": "/vendor/three/examples/jsm/" } }
+</script>
+</head>
+<body>
+<header class="top">
+  <span class="brand" id="app-name">HQ</span>
+  <nav class="tabs" aria-label="Views">
+    <a href="#dashboard" id="tab-dashboard">Dashboard</a>
+    <a href="#penthouse" id="tab-penthouse">Penthouse</a>
+  </nav>
+  <button type="button" class="quiet" id="streamer-top" aria-pressed="false" title="Hide every name and title, for recording">Streamer</button>
+  <p class="pill" id="pill" aria-live="polite">Connecting</p>
+  <div class="load-line" id="load-line" hidden></div>
+</header>
+<p class="stale" id="stale" hidden></p>
+<main>
+  <section id="view-dashboard" class="view">
+    <div class="grid">
+      <section class="hero" id="hero"></section>
+      <section class="mod vitals"><h2>Vitals</h2><p class="stats" id="stats"></p></section>
+      <section class="mod live"><h2>Live</h2><ul class="rows scroll" id="sessions"></ul></section>
+      <aside class="mod rail" id="flow" aria-label="Flow"></aside>
+      <section class="mod who"><h2>Who works with whom</h2><div class="team" id="team"></div></section>
+    </div>
+    <section class="mod financials" id="financials"><h2>Financials</h2><div id="fin"></div></section>
+  </section>
+  <!-- The Penthouse tab is the room alone; it is built the first time this view shows (app.js) -->
+  <section id="view-penthouse" class="view" hidden><div id="floor"></div></section>
+</main>
+<script type="module" src="/public/app.js"></script>
+<!-- The Penthouse's overlay, cloned into #floor by public/floor/stage.js when the room is built -->
+<template id="floor-ui">
+<header class="bar">
+  <div class="brand"><span class="mark">HQ</span><span class="title">The Penthouse</span></div>
+  <nav class="seg" aria-label="Camera">
+    <button data-view="boss" class="on">Boss</button>
+    <button data-view="floor">Floor</button>
+    <button data-view="lounge">Lounge</button>
+    <button data-view="games">Games</button>
+    <button data-view="top">Overhead</button>
+  </nav>
+  <button class="rally" id="rally">Rally<span class="long"> the floor</span></button>
+</header>
+
+<div class="foot-ui">
+  <p class="pill legend"><span><i class="dot d-boss"></i>You</span><span><i class="dot d-work"></i>Working</span><span><i class="dot d-idle"></i>Idle, no task</span></p>
+  <p class="pill hint">Drag to orbit · Click anyone, your desk or the table</p>
+  <div class="pill ctls"><button type="button" id="streamer" aria-pressed="false" title="Hide every name and task, for recording">Streamer</button><button type="button" id="expand">Full screen</button></div>
+</div>
+
+<aside class="panel" id="panel" aria-live="polite">
+  <button class="x" id="close" aria-label="Close">&times;</button>
+  <p class="eyebrow" id="p-dept"></p>
+  <h2 id="p-name"></h2>
+  <p class="status"><i class="dot" id="p-dot"></i><span id="p-status"></span></p>
+  <p class="doing" id="p-doing"></p>
+  <div class="beat" id="p-beat" hidden><p class="task" id="p-task"></p><ul id="p-sum"></ul><p class="upd" id="p-upd"></p></div>
+  <button class="move" id="p-move" type="button" hidden></button>
+  <p class="look" id="p-look"></p>
+  <div class="swatches" id="p-sw"></div>
+  <p class="sect">Avatar data</p>
+  <pre id="p-json"></pre>
+  <p class="note" id="p-note"></p>
+</aside>
+
+<div class="loading" id="loading">Building the Penthouse</div>
+</template>
+</body>
+</html>

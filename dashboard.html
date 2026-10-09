@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Claude Code · Usage Dashboard</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23ff8a5b'/%3E%3Ctext x='16' y='23' font-size='20' font-family='monospace' font-weight='bold' text-anchor='middle' fill='%230b0d10'%3E$%3C/text%3E%3C/svg%3E" />
+<style>
+  :root {
+    --bg: #0b0d10; --panel: #14181d; --line: #232a33; --txt: #e6edf3;
+    --dim: #8b97a6; --accent: #ff8a5b; --good: #4ade80; --bad: #f87171; --blue: #60a5fa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--txt);
+    font: 13.5px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    padding: 24px 20px 40px; max-width: 1120px; margin: 0 auto;
+  }
+  header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+  h1 { font-size: 15px; font-weight: 600; margin: 0; letter-spacing: .3px; }
+  .sub { color: var(--dim); font-size: 12px; }
+  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 13px; padding: 16px 18px; }
+  .card h2 { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .9px; color: var(--dim); margin: 0 0 13px; }
+  .s12 { grid-column: span 12; } .s8 { grid-column: span 8; } .s4 { grid-column: span 4; } .s6 { grid-column: span 6; }
+  @media (max-width: 820px) { .grid > * { grid-column: span 12 !important; } }
+  .big { font-size: 32px; font-weight: 700; letter-spacing: -.5px; line-height: 1.1; }
+  .vs { color: var(--dim); font-size: 13px; font-weight: 400; }
+  .pill { display: inline-block; font-size: 12px; padding: 3px 9px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); }
+  .good { color: var(--good); } .bad { color: var(--bad); } .accent { color: var(--accent); }
+  .kv { display: flex; justify-content: space-between; padding: 5px 0; }
+  .kv .v { color: var(--dim); }
+  .mini { font-size: 11.5px; color: var(--dim); }
+  .row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--line); gap: 12px; }
+  .row:last-child { border-bottom: 0; }
+  .row .label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row .meta { color: var(--dim); font-size: 12px; white-space: nowrap; }
+  .agent { display: grid; grid-template-columns: 1fr 84px 78px 92px; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .agent:last-child { border-bottom: 0; }
+  .agent .x { color: var(--dim); text-align: right; }
+  .agent .x b, .agent .n b { color: var(--txt); }
+  .agent .h { color: var(--dim); font-size: 10.5px; text-transform: uppercase; letter-spacing: .6px; }
+  .bars { display: flex; align-items: flex-end; gap: 3px; height: 96px; }
+  .bar { flex: 1; background: #34404d; border-radius: 3px 3px 0 0; min-height: 2px; transition: opacity .15s; }
+  .bar.today { background: var(--accent); }
+  .bar:hover { opacity: .7; }
+  .mm { height: 10px; border-radius: 999px; overflow: hidden; display: flex; background: var(--line); margin-bottom: 12px; }
+  .mm > span { height: 100%; }
+  .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--good); margin-right: 5px; vertical-align: middle; }
+  .dot.warm { background: var(--accent); animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { opacity: .35; } }
+  .foot { color: var(--dim); font-size: 11px; margin-top: 18px; text-align: center; }
+  .center { text-align: center; padding: 60px 20px; }
+  .prog { height: 8px; background: var(--line); border-radius: 999px; overflow: hidden; max-width: 380px; margin: 14px auto 0; }
+  .prog > div { height: 100%; background: var(--accent); width: 0; transition: width .3s; }
+  b { font-weight: 600; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Claude Code · Usage Dashboard</h1>
+    <div class="sub" id="status"><span class="dot warm"></span>connecting…</div>
+  </header>
+  <div id="app"></div>
+  <div class="foot" id="foot"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const usd = (n) => "$" + (n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const usd0 = (n) => "$" + Math.round(n || 0).toLocaleString();
+const tok = (n) => {
+  n = n || 0;
+  if (n >= 1e9) return (n / 1e9).toFixed(2) + "B";
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + "k";
+  return String(Math.round(n));
+};
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const MODEL_COLORS = ["#ff8a5b", "#60a5fa", "#4ade80", "#c084fc", "#fbbf24", "#94a3b8"];
+
+function indexing(s) {
+  const pct = s.progress && s.progress.total ? Math.round((s.progress.done / s.progress.total) * 100) : 0;
+  $("app").innerHTML =
+    '<div class="card center"><div class="big accent">Indexing your history…</div>' +
+    '<div class="mini" style="margin-top:8px">First run reads every transcript once, then caches it — later launches are instant.</div>' +
+    '<div class="prog"><div style="width:' + pct + '%"></div></div>' +
+    '<div class="mini" style="margin-top:10px">' + (s.progress ? s.progress.done + " / " + s.progress.total + " files" : "") + "</div></div>";
+  $("status").innerHTML = '<span class="dot warm"></span>indexing ' + pct + "%";
+}
+
+function agentRows(a) {
+  let h = '<div class="agent"><div class="n h">agent</div><div class="x h">output</div><div class="x h">tools</div><div class="x h">cost</div></div>';
+  for (const ag of a.agents) {
+    const tip = "fresh in " + tok(ag.fin) + " · cache-read " + tok(ag.cread) + " · cache-write " + tok(ag.cwrite);
+    h += '<div class="agent" title="' + esc(tip) + '"><div class="n">' + esc(ag.label) + "</div>" +
+      '<div class="x">' + tok(ag.out) + "</div><div class=\"x\">" + ag.tools + '</div><div class="x">' + usd(ag.cost) + "</div></div>";
+  }
+  const t = a.total;
+  h += '<div class="agent"><div class="n"><b>total</b></div><div class="x"><b>' + tok(t.out) +
+    '</b></div><div class="x"><b>' + t.tools + '</b></div><div class="x"><b>' + usd(t.cost) + "</b></div></div>";
+  return h;
+}
+
+function render(s) {
+  if (s.error) { $("app").innerHTML = '<div class="card"><b class="bad">error</b><pre class="mini">' + esc(s.error) + "</pre></div>"; return; }
+  if (s.monthToDate === undefined) { indexing(s); return; }
+
+  const saving = s.savedVsApi;
+  const savingHtml = saving >= 0
+    ? '<span class="pill good">▲ ' + usd0(saving) + " saved vs API this month</span>"
+    : '<span class="pill">' + usd0(-saving) + " below the $" + s.plan + " line so far this month</span>";
+
+  const cs = s.totals.cacheSaved, csNeg = cs < 0;
+  const a = s.active;
+  const agentsCard = a
+    ? '<div class="mini" style="margin:-6px 0 10px">' + esc(a.project) + " · " + esc(a.sessionId.slice(0, 8)) +
+        "</div>" + agentRows(a)
+    : '<div class="mini">no active session detected</div>';
+
+  const modelTotal = s.byModel.reduce((x, m) => x + m.cost, 0) || 1;
+  const mmBar = s.byModel.map((m, i) =>
+    '<span style="width:' + (m.cost / modelTotal) * 100 + "%;background:" + MODEL_COLORS[i % MODEL_COLORS.length] + '"></span>'
+  ).join("");
+  const mmRows = s.byModel.map((m, i) =>
+    '<div class="row"><span class="label"><span style="color:' + MODEL_COLORS[i % MODEL_COLORS.length] + '">●</span> ' +
+    esc(m.model.replace("claude-", "")) + '</span><span class="meta">' + Math.round((m.cost / modelTotal) * 100) + "% · " + usd0(m.cost) + "</span></div>"
+  ).join("");
+
+  const projRows = s.byProject.slice(0, 9).map((p) =>
+    '<div class="row"><span class="label">' + esc(p.project) + '</span><span class="meta">' + tok(p.tokens) + " · " + usd0(p.cost) + "</span></div>"
+  ).join("") || '<div class="mini">no data</div>';
+
+  const toolRows = s.byTool.map((t) =>
+    '<div class="row"><span class="label">' + esc(t.name.replace(/^mcp__/, "")) + '</span><span class="meta">×' + t.count.toLocaleString() + " · " + usd(t.cost) + "</span></div>"
+  ).join("") || '<div class="mini">no data</div>';
+
+  const max = Math.max(0.0001, ...s.last30.map((d) => d.cost));
+  const sum30 = s.last30.reduce((x, d) => x + d.cost, 0);
+  const trend = s.last30.map((d, i) =>
+    '<div class="bar' + (i === s.last30.length - 1 ? " today" : "") + '" style="height:' +
+    Math.max(2, (d.cost / max) * 96) + 'px" title="' + d.date + ": " + usd(d.cost) + '"></div>'
+  ).join("");
+
+  $("app").innerHTML =
+    '<div class="grid">' +
+      '<div class="card s8"><h2>API-equivalent spend vs $' + s.plan + " flat plan</h2>" +
+        '<div class="big">' + usd0(s.monthToDate) + ' <span class="vs">this month</span></div>' +
+        '<div style="margin-top:10px">' + savingHtml + "</div>" +
+        '<div class="kv" style="margin-top:14px"><span>Today</span><span class="v">' + usd(s.today) + "</span></div>" +
+        '<div class="kv"><span>Projected this month (current pace)</span><span class="v">' + usd0(s.projMonth) + "</span></div>" +
+        '<div class="kv"><span>All-time API-equivalent</span><span class="v">' + usd0(s.totals.cost) + "</span></div>" +
+        '<div class="mini" style="margin-top:11px">Exact weekly/monthly limits + reset times live in <b>/usage</b>. This is your real-money burn if you paid API rates.</div></div>' +
+
+      '<div class="card s4"><h2>Cache savings</h2><div class="big ' + (csNeg ? "bad" : "good") + '">' + (csNeg ? "-" + usd0(-cs) : usd0(cs)) + "</div>" +
+        '<div class="mini" style="margin-top:7px">' + (csNeg
+          ? "Net cache <b>cost</b> in these sessions — writes outweighed reads."
+          : "Saved by prompt caching — reads bill at 0.1× vs full input, net of write premiums. The single biggest reason your $200 goes so far.") + "</div></div>" +
+
+      '<div class="card s12"><h2>Live agents · current session</h2>' + agentsCard + "</div>" +
+
+      '<div class="card s4"><h2>Cost by project</h2>' + projRows + "</div>" +
+      '<div class="card s4"><h2>Top tools (attributed)</h2>' + toolRows + "</div>" +
+      '<div class="card s4"><h2>Model mix (by cost)</h2><div class="mm">' + mmBar + "</div>" + mmRows + "</div>" +
+
+      '<div class="card s12"><h2>30-day API-equivalent spend</h2><div class="bars">' + trend + "</div>" +
+        '<div class="mini" style="margin-top:9px">last 30 days <b>' + usd0(sum30) + "</b> · peak day " + usd(max) + " · today highlighted</div></div>" +
+    "</div>";
+
+  $("status").innerHTML = (s.building ? '<span class="dot warm"></span>refreshing' : '<span class="dot"></span>live') +
+    " · all local, nothing leaves this machine";
+  $("foot").textContent = "updated " + new Date(s.generatedAt).toLocaleTimeString() + " · auto-refresh every 3s";
+}
+
+async function tick() {
+  try {
+    const r = await fetch("/api/stats", { cache: "no-store" });
+    render(await r.json());
+  } catch (e) {
+    $("status").innerHTML = '<span class="dot warm"></span>waiting for server…';
+  }
+}
+tick();
+setInterval(tick, 3000);
+</script>
+</body>
+</html>

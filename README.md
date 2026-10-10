@@ -15,6 +15,10 @@ Everything stays on your machine. The server listens on 127.0.0.1 only, is read-
 
 ## Quick start
 
+Using an AI coding agent? Give it this repo's link and ask it to set up HQ: [AGENTS.md](AGENTS.md) walks it through install, auto-open, your agents and your look.
+
+By hand:
+
 ```sh
 git clone <this repo> penthouse-hq
 cd penthouse-hq
